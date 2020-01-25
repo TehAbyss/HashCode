@@ -3,6 +3,7 @@ namespace HashPhotoSlideshow.Controller
 	using System;
 	using System.IO;
 	using System.Text;
+	using HashPhotoSlideshow.Model;
 
     public class OutputProcessor
     {
@@ -16,10 +17,10 @@ namespace HashPhotoSlideshow.Controller
     	public void ProcessSlideShow() {
     		using (var fs = File.Create(slideshowOutputFileName)) {
     			using (var sr = new StreamWriter(fs)) {
-	    			sr.WriteLine(Slideshow.size().ToString());
+	    			sr.WriteLine(Slideshow.Slides.Count.ToString());
 
-	    			foreach (var slide in Slideshow) {
-	    				foreach (var photo in slide) {
+	    			foreach (var slide in Slideshow.Slides) {
+	    				foreach (var photo in slide.Photos) {
 	    					sr.Write($"{photo.Id.ToString()} ");
 	    				}
 	    				sr.WriteLine();
