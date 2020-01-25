@@ -1,11 +1,12 @@
 namespace HashPhotoSlideshow.Controller
 {
+	using System;
 	using System.IO;
 	using System.Text;
 
     public class OutputProcessor
     {
-    	private string slideshowOutputFileName = $"slideshow_{Date.now()}";
+    	private string slideshowOutputFileName = $"slideshow_{DateTime.Now}";
     	private Slideshow Slideshow {get;}
 
     	public OutputProcessor(Slideshow slideshow) {
