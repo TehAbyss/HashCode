@@ -5,6 +5,6 @@ namespace HashPhotoSlideshow.Model
     using System.Collections.Generic;
     public class Slide
     {
-        PhotoCollection Photos;
+        public PhotoCollection Photos;
     }
 }
