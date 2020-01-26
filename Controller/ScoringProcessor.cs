@@ -1,6 +1,5 @@
 namespace HashPhotoSlideshow.Controller
 {
-    using System;
     using System.Collections.Generic;
     using HashPhotoSlideshow.Model;
 
@@ -10,17 +9,12 @@ namespace HashPhotoSlideshow.Controller
         {
             int interestScore = 0;
 
-            if (slideshow == null)
+            if (slideshow == null || slideshow.Slides == null || slideshow.Slides.Count < 2)
             {
                 return 0;
             }
 
-            if (slideshow.Slides == null || slideshow.Slides.Count < 2) 
-            {
-                return 0;
-            }
-
-            for( int i = 0; i < slideshow.Slides.Count - 1; i++)
+            for (int i = 0; i < slideshow.Slides.Count - 1; i++)
             {
                 interestScore += CalculateInterestScore(slideshow.Slides[i], slideshow.Slides[i + 1]);
             }
@@ -37,7 +31,7 @@ namespace HashPhotoSlideshow.Controller
             List<string> trackTags = new List<string>();
 
             // Process slide1
-            foreach(var photo in slide1.Photos)
+            foreach (var photo in slide1.Photos)
             {
                 foreach (var tag in photo.Tags)
                 {
@@ -50,7 +44,7 @@ namespace HashPhotoSlideshow.Controller
             }
 
             // Process slide2
-            foreach(var photo in slide2.Photos)
+            foreach (var photo in slide2.Photos)
             {
                 foreach (var tag in photo.Tags)
                 {
