@@ -2,6 +2,6 @@ namespace HashPhotoSlideshow.Model
 {
     public class Slide
     {
-        public PhotoCollection Photos;
+        public PhotoCollection Photos = new PhotoCollection();
     }
 }

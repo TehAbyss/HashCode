@@ -4,6 +4,6 @@ namespace HashPhotoSlideshow.Model
 
     public class Slideshow
     {
-        public List<Slide> Slides;
+        public List<Slide> Slides = new List<Slide>();
     }
 }
