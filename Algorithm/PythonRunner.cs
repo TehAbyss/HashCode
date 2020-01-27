@@ -4,39 +4,45 @@ namespace HashPhotoSlideshow.Algorithm
     using System.IO;
     using HashPhotoSlideshow.Model;
 
-    public class PythonRunner : ISlideshowAlgorithm
+    public class PythonRunner : ISlideshowAlgorithm, IInternalAlgorithm
     {
         public string ScriptPath { get; }
+
         public PythonRunner(string scriptPath)
         {
             ScriptPath = scriptPath;
+
+            if (!File.Exists(ScriptPath))
+            {
+                throw new FileNotFoundException($"{ScriptPath} file does not exist.");
+            }
         }
 
         public Slideshow GenerateSlideshow(PhotoCollection photoCollection)
         {
-            string result = RunPython(ScriptPath);
-            return new Slideshow(); 
+            string standardOutput = Run();
+            return new Slideshow();
         }
 
-        public string RunPython(string pythonScriptPath)
+        private string Run()
         {
-            string result = string.Empty;
+            string standardOutput = string.Empty;
 
             ProcessStartInfo start = new ProcessStartInfo();
             start.FileName = "python.exe";
-            start.Arguments = pythonScriptPath;
-            start.UseShellExecute = true;
+            start.Arguments = ScriptPath;
+            start.UseShellExecute = false;
             start.RedirectStandardOutput = true;
 
-            using(Process process = Process.Start(start))
+            using (Process process = Process.Start(start))
             {
-                using(StreamReader reader = process.StandardOutput)
+                using (StreamReader reader = process.StandardOutput)
                 {
-                    result = reader.ReadToEnd();
+                    standardOutput = reader.ReadToEnd();
                 }
             }
 
-            return result;
+            return standardOutput;
         }
     }
 }

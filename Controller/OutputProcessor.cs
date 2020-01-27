@@ -6,23 +6,21 @@ namespace HashPhotoSlideshow.Controller
 
     public class OutputProcessor
     {
-        private string slideshowOutputFileName = $"slideshow_{DateTime.Now}";
-        private Slideshow Slideshow { get; }
-
-        public OutputProcessor(Slideshow slideshow)
+        public static void ProcessSlideShow(Slideshow slideshow, string outputFileName)
         {
-            Slideshow = slideshow;
-        }
+            // sanitize file names if necessary
+            foreach (char c in Path.GetInvalidFileNameChars())
+            {
+                outputFileName = outputFileName.Replace(c, '_');
+            }
 
-        public void ProcessSlideShow()
-        {
-            using (var fs = File.Create(slideshowOutputFileName))
+            using (var fs = File.Create(outputFileName))
             {
                 using (var sr = new StreamWriter(fs))
                 {
-                    sr.WriteLine(Slideshow.Slides.Count.ToString());
+                    sr.WriteLine(slideshow.Slides.Count.ToString());
 
-                    foreach (var slide in Slideshow.Slides)
+                    foreach (var slide in slideshow.Slides)
                     {
                         foreach (var photo in slide.Photos)
                         {
@@ -31,6 +29,27 @@ namespace HashPhotoSlideshow.Controller
                         sr.WriteLine();
                     }
                 }
+            }
+        }
+
+        public void ProcessSlideshowToConsole(Slideshow slideshow)
+        {
+            try
+            {
+                Console.WriteLine("#### Slideshow ####");
+                Console.WriteLine($"Number of slides: {slideshow?.Slides?.Count}");
+                foreach (var slide in slideshow?.Slides)
+                {
+                    foreach (var photo in slide?.Photos)
+                    {
+                        Console.Write($"{photo.Id.ToString()} ");
+                    }
+                    Console.WriteLine();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
             }
         }
     }

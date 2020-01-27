@@ -9,62 +9,46 @@ namespace HashPhotoSlideshow.Controller
         {
             int interestScore = 0;
 
-            if (slideshow == null || slideshow.Slides == null || slideshow.Slides.Count < 2)
+            if (slideshow?.Slides?.Count > 1)
             {
-                return 0;
-            }
-
-            for (int i = 0; i < slideshow.Slides.Count - 1; i++)
-            {
-                interestScore += CalculateInterestScore(slideshow.Slides[i], slideshow.Slides[i + 1]);
+                for (int i = 0; i < slideshow.Slides.Count - 1; i++)
+                {
+                    interestScore += Judge(slideshow.Slides[i], slideshow.Slides[i + 1]);
+                }
             }
 
             return interestScore;
         }
 
-        public static int CalculateInterestScore(Slide slide1, Slide slide2)
+        public static int Judge(Slide slide1, Slide slide2)
         {
-            int numberOfTagsInCommon = 0;
-            int numberOfTagsInS1NotS2 = 0;
-            int numberOfTagsInS2NotS1 = 0;
-
-            List<string> trackTags = new List<string>();
-
-            // Process slide1
+            // Get tags from slide 1
+            var s1Tags = new HashSet<string>();
             foreach (var photo in slide1.Photos)
             {
-                foreach (var tag in photo.Tags)
-                {
-                    if (!trackTags.Contains(tag))
-                    {
-                        trackTags.Add(tag);
-                        numberOfTagsInS1NotS2++;
-                    }
-                }
+                s1Tags.UnionWith(photo.Tags);
             }
 
-            // Process slide2
+            // Get tags fom slide 2
+            var s2Tags = new HashSet<string>();
             foreach (var photo in slide2.Photos)
             {
-                foreach (var tag in photo.Tags)
-                {
-                    if (!trackTags.Contains(tag))
-                    {
-                        trackTags.Add(tag);
-                        numberOfTagsInS2NotS1++;
-                    }
-                    else
-                    {
-                        numberOfTagsInCommon++;
-                        numberOfTagsInS1NotS2--;
-                    }
-                }
+                s2Tags.UnionWith(photo.Tags);
             }
 
-            int minScore = int.MaxValue;
-            minScore = numberOfTagsInCommon < minScore ? numberOfTagsInCommon : minScore;
-            minScore = numberOfTagsInS1NotS2 < minScore ? numberOfTagsInS1NotS2 : minScore;
-            minScore = numberOfTagsInS2NotS1 < minScore ? numberOfTagsInS2NotS1 : minScore;
+            // Calculate interest scores
+            var commonTags = new HashSet<string>(s1Tags);
+            commonTags.IntersectWith(s2Tags);
+
+            var s1OnlyTags = new HashSet<string>(s1Tags);
+            s1OnlyTags.ExceptWith(s2Tags);
+
+            var s2OnlyTags = new HashSet<string>(s2Tags);
+            s2OnlyTags.ExceptWith(s1Tags);
+
+            int minScore = commonTags.Count;
+            minScore = s1OnlyTags.Count < minScore ? s1OnlyTags.Count : minScore;
+            minScore = s2OnlyTags.Count < minScore ? s2OnlyTags.Count : minScore;
 
             return minScore;
         }
