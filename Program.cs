@@ -59,6 +59,9 @@ namespace HashPhotoSlideshow
                         Console.WriteLine("Invalid selection. Please select another option.");
                         Console.WriteLine();
                     }
+
+                    Console.Write("Press enter to continue...");
+                    Console.ReadLine();
                 }
             }
         }
