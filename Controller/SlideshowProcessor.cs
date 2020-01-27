@@ -6,7 +6,6 @@ namespace HashPhotoSlideshow.Controller
     using System.Collections.Generic;
     public static class SlideshowProcessor
     {
-        private static HashSet<int> photoCache;
         public static Slideshow GenerateSlideShow(ISlideshowAlgorithm algo) {
             if (algo is TagHeapSorting) {
                 return GetSlideshow(algo as TagHeapSorting);
@@ -17,7 +16,7 @@ namespace HashPhotoSlideshow.Controller
 
         private static Slideshow GetSlideshow(TagHeapSorting tagHeapSorting) {
             var slideShow = new Slideshow();
-            photoCache = new HashSet<int>();
+            var photoCache = new HashSet<int>();
             var vSlide = new Slide();
 
             try {
