@@ -6,7 +6,7 @@ namespace HashPhotoSlideshow
     {
         public int Id;
         public Orientation Orientation;
-        public List<string> Tags;
+        public List<string> Tags = new List<string>();
     }
 
     public enum Orientation
