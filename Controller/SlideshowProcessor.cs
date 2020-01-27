@@ -18,7 +18,7 @@ namespace HashPhotoSlideshow.Controller
         private static Slideshow GetSlideshow(TagHeapSorting tagHeapSorting) {
             var slideShow = new Slideshow();
             photoCache = new HashSet<int>();
-            var slide = new Slide();
+            var vSlide = new Slide();
 
             try {
                 foreach(var tag in tagHeapSorting?.TagSort) {                   
@@ -26,10 +26,18 @@ namespace HashPhotoSlideshow.Controller
                         if (!photoCache.Contains(photo.Id)) {
                             photoCache.Add(photo.Id);
 
-                            slide.Photos.Add(photo);
-                            if (photo.Orientation == Orientation.Horizontal || slide.Photos.Count > 1) {
-                                slideShow.Slides.Add(slide);
-                                slide = new Slide();
+                            if (photo.Orientation == Orientation.Horizontal) {
+                                var hSlide = new Slide();
+                                hSlide.Photos.Add(photo);
+                                slideShow.Slides.Add(hSlide);
+                            }
+                            else {
+                                vSlide.Photos.Add(photo);
+
+                                if (vSlide.Photos.Count > 1) {
+                                    slideShow.Slides.Add(vSlide);
+                                    vSlide = new Slide();
+                                }
                             }
                         }
                     }
