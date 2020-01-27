@@ -32,6 +32,7 @@ namespace HashPhotoSlideshow
 
             try {
                 var tagHeapSort = new TagHeapSorting().GenerateSlideshow(photoCollection);
+                Console.WriteLine("#### Slideshow ####");
                 foreach(var slide in tagHeapSort?.Slides) {
                     foreach(var photo in slide?.Photos) {
                         Console.Write($"{photo.Id.ToString()} ");

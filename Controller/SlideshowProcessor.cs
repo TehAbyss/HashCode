@@ -18,15 +18,14 @@ namespace HashPhotoSlideshow.Controller
         private static Slideshow GetSlideshow(TagHeapSorting tagHeapSorting) {
             var slideShow = new Slideshow();
             photoCache = new HashSet<int>();
+            var slide = new Slide();
 
             try {
-                foreach(var tag in tagHeapSorting?.TagSort) {
-                    var slide = new Slide();
-                    
+                foreach(var tag in tagHeapSorting?.TagSort) {                   
                     foreach(var photo in tag?.Photos) {
                         if (!photoCache.Contains(photo.Id)) {
                             photoCache.Add(photo.Id);
-                            
+
                             slide.Photos.Add(photo);
                             if (photo.Orientation == Orientation.Horizontal || slide.Photos.Count > 1) {
                                 slideShow.Slides.Add(slide);
@@ -35,13 +34,14 @@ namespace HashPhotoSlideshow.Controller
                         }
                     }
                 }
+
+
+                return slideShow;
             }
             catch {
                 Console.WriteLine("Error in GetSLideShow");
                 throw;
             }
-
-            return slideShow;
         }
     }
 }

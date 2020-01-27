@@ -25,7 +25,7 @@ namespace HashPhotoSlideshow.Algorithm
                             };
                             TagCache.Add(tag, tagObj);
                         }
-                        TagCache[tag]?.Photos?.Add(photo);
+                        TagCache[tag].Photos.Add(photo);
                     }
                 }
             }
@@ -38,7 +38,9 @@ namespace HashPhotoSlideshow.Algorithm
         private void SortByTag() {
             try {
                 foreach(var kv in TagCache) {
-                    TagSort.Add(kv.Value);
+                    if (!TagSort.Add(kv.Value)) {
+                        Console.WriteLine($"Could not add {kv.Key}");
+                    }
                 }
             }
             catch {
@@ -51,7 +53,12 @@ namespace HashPhotoSlideshow.Algorithm
     internal class ByPhotoCount : IComparer<Tag>
     {
         public int Compare(Tag a, Tag b) {
-            return a.Photos.Count.CompareTo(b.Photos.Count);
+            if (a.Photos.Count.CompareTo(b.Photos.Count) >= 0)
+            {
+                return 1;
+            }
+
+            return -1;
         }
     }
 }
