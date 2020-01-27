@@ -1,49 +1,76 @@
-﻿using System;
-
 namespace HashPhotoSlideshow
 {
-    using HashPhotoSlideshow.Algorithm;
-    using HashPhotoSlideshow.Model;
+    using System;
+    using System.Globalization;
+    using HashPhotoSlideshow.Controller;
+
     class Program
     {
         static void Main(string[] args)
         {
-            var photoCollection = new PhotoCollection();
-            photoCollection.Add(new Photo(){
-                Id = 0,
-                Orientation = Orientation.Horizontal,
-                Tags = {"cat", "beach", "sun"}
-            });
-            photoCollection.Add(new Photo(){
-                Id = 1,
-                Orientation = Orientation.Vertical,
-                Tags = {"selfie", "smile"}
-            });
-            photoCollection.Add(new Photo(){
-                Id = 2,
-                Orientation = Orientation.Vertical,
-                Tags = {"selfie", "garden"}
-            });
-            photoCollection.Add(new Photo(){
-                Id = 3,
-                Orientation = Orientation.Horizontal,
-                Tags = {"cat", "garden"}
-            });
+            var userInput = string.Empty;
+            var isAll = false;
+            var isQuit = false;
 
-            try {
-                var tagHeapSort = new TagHeapSorting().GenerateSlideshow(photoCollection);
-                Console.WriteLine("#### Slideshow ####");
-                Console.WriteLine($"Number of slides: {tagHeapSort?.Slides?.Count}");
-                foreach(var slide in tagHeapSort?.Slides) {
-                    foreach(var photo in slide?.Photos) {
-                        Console.Write($"{photo.Id.ToString()} ");
+            var slideshowProcessor = new SlideshowProcessor();
+
+            while (!isQuit)
+            {
+                Console.WriteLine("Hash Code Photo Slideshow");
+                Console.WriteLine();
+                Console.WriteLine("Available algorithms:");
+
+                for (int i = 0; i < slideshowProcessor.AlgorithmNames.Count; i++)
+                {
+                    Console.WriteLine($"    {i}: {slideshowProcessor.AlgorithmNames[i]}");
+                }
+
+                Console.WriteLine($"    a: All");
+                Console.WriteLine($"    q: Quit");
+                Console.WriteLine();
+
+                Console.Write("Select algorithm: ");
+                userInput = Console.ReadLine();
+
+                Console.WriteLine();
+
+                isAll = (userInput.Equals("a") || userInput.Equals("A"));
+                isQuit = (userInput.Equals("q") || userInput.Equals("Q"));
+
+                if (!isQuit)
+                {
+                    if (isAll)
+                    {
+                        Console.WriteLine($"Running all algorithms");
+
+                        for (int i = 0; i < slideshowProcessor.AlgorithmNames.Count; i++)
+                        {
+                            slideshowProcessor.RunAlgorithm(i);
+                            Console.WriteLine();
+                        }
                     }
-                    Console.WriteLine();
+                    else if (TryParseAlgorithmIndex(userInput, slideshowProcessor.AlgorithmNames.Count, out int i))
+                    {
+                        slideshowProcessor.RunAlgorithm(i);
+                        Console.WriteLine();
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid selection. Please select another option.");
+                        Console.WriteLine();
+                    }
                 }
             }
-            catch (Exception e) {
-                Console.WriteLine(e.Message);
+        }
+
+        internal static bool TryParseAlgorithmIndex(string userInput, int algorithmCount, out int algorithmIndex)
+        {
+            if (int.TryParse(userInput, NumberStyles.Number, CultureInfo.InvariantCulture, out algorithmIndex))
+            {
+                return (algorithmIndex < algorithmCount);
             }
+
+            return false;
         }
     }
 }

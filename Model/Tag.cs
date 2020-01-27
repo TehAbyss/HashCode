@@ -1,4 +1,4 @@
-namespace HashPhotoSlideshow
+namespace HashPhotoSlideshow.Model
 {
     using System.Collections.Generic;
 

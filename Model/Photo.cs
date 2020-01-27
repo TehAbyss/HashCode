@@ -1,4 +1,4 @@
-namespace HashPhotoSlideshow
+namespace HashPhotoSlideshow.Model
 {
     using System.Collections.Generic;
 
@@ -7,11 +7,5 @@ namespace HashPhotoSlideshow
         public int Id;
         public Orientation Orientation;
         public List<string> Tags = new List<string>();
-    }
-
-    public enum Orientation
-    {
-        Horizontal,
-        Vertical
     }
 }
