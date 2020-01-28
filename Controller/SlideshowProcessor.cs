@@ -10,8 +10,11 @@ namespace HashPhotoSlideshow.Controller
 
     public class SlideshowProcessor
     {
+        private static readonly string InputFilePath = @"Input";
         private static readonly string PythonScriptPath = @"Python";
         private static readonly string PythonHeader = "Python:";
+        public ReadOnlyCollection<string> InputFilePaths { get => InputFilePathsInternal.AsReadOnly(); }
+        private List<string> InputFilePathsInternal = new List<string>();
         public ReadOnlyCollection<string> AlgorithmNames { get => AlgorithmNamesInternal.AsReadOnly(); }
         private List<string> AlgorithmNamesInternal = new List<string>();
         private Dictionary<string, string> PythonAlgorithms = new Dictionary<string, string>();
@@ -19,6 +22,7 @@ namespace HashPhotoSlideshow.Controller
 
         public SlideshowProcessor()
         {
+            LoadInputFiles();
             LoadAlgorithms();
         }
 
@@ -27,22 +31,55 @@ namespace HashPhotoSlideshow.Controller
             // Parse input file OR use test data
             var photoCollection = GetTestData();
 
+            int numPhotos = photoCollection.Count;
+            int numHorizontal = photoCollection.Where(p => p.Orientation == Orientation.Horizontal).Count();
+            int numVertical = photoCollection.Where(p => p.Orientation == Orientation.Vertical).Count();
+
             // Generate slideshow
             Console.WriteLine($"Running {AlgorithmNames[algorithmIndex]}");
+            var startAlgorithmTime = DateTime.Now;
+
             var slideshow = InvokeAlgorithm(photoCollection, algorithmIndex);
+
+            var endAlgorithmTime = DateTime.Now;
+            var algorithmDuration = endAlgorithmTime.Subtract(startAlgorithmTime).TotalMilliseconds;
+            Console.WriteLine();
+            Console.WriteLine($"[Duration] {algorithmDuration} ms");
 
             // Score slideshow
             var score = ScoringProcessor.Judge(slideshow);
-            Console.WriteLine();
-            Console.WriteLine($"[Score] {score}");
-            Console.WriteLine($"[Number of slides] {slideshow.Slides.Count}");
-            Console.WriteLine();
 
             // Output submission file
             string outputFileName = $"slideshow_{AlgorithmNames[algorithmIndex]}_{DateTime.Now.ToString("yyyyMMdd_hhmmss")}.txt";
             OutputProcessor.ProcessSlideShow(slideshow, outputFileName);
             Console.WriteLine($"Submission file saved to {Path.GetFullPath(outputFileName)}");
+
+            // Result Information
+            int numResultPhotos = 0;
+            int numResultHorizontal = 0;
+            int numResultVertical = 0;
+            slideshow.Slides.ForEach((s) =>
+            {
+                numResultPhotos += s.Photos.Count;
+                numResultHorizontal += s.Photos.Where(p => p.Orientation == Orientation.Horizontal).Count();
+                numResultVertical += s.Photos.Where(p => p.Orientation == Orientation.Vertical).Count();
+            });
+
             Console.WriteLine();
+            Console.WriteLine($"[Input] {numPhotos} photos, {numHorizontal} horizontal, {numVertical} vertical");
+            Console.WriteLine($"[Output] {numResultPhotos} photos, {numResultHorizontal} horizontal, {numResultVertical} vertical");
+            Console.WriteLine($"[Slides] {slideshow.Slides.Count}");
+            Console.WriteLine($"[Score] {score}");
+            Console.WriteLine();
+        }
+
+        private void LoadInputFiles()
+        {
+            // Get all input files
+            if (Directory.Exists(InputFilePath))
+            {
+                InputFilePathsInternal = Directory.GetFiles(InputFilePath, "*.txt").ToList();
+            }
         }
 
         private void LoadAlgorithms()
