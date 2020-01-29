@@ -1,3 +1,4 @@
+using HashPhotoSlideshow.Model;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,73 +8,60 @@ namespace HashPhotoSlideshow.Controller
 {
     public class InputProcessor
     {
-        List<string> _lines;
         public List<Photo> _photo;
-        public int _totalPhoto;
 
         public InputProcessor()
         {
-            _lines = new List<string>();
             _photo = new List<Photo>();
-            _totalPhoto = 0;
         }
 
-        private void ReadInputFile()
+        public void ReadInputFile()
         {
-            //string path = "..\\..\\..\\inputFile.txt";
+            //string path = "..\\..\\..\\inputFile.txt"; 
             string path = "inputFile.txt";
 
             if (File.Exists(path))
             {
-                List<string> list = new List<string>();
                 FileStream fileStream = new FileStream(path, FileMode.Open, FileAccess.Read);
-                using (var streamReader = new StreamReader(fileStream, Encoding.UTF8))
+                using (var streamReader = new StreamReader(fileStream))
                 {
+                    int photoCount = 0;
+                    int photoId = 0;
                     string line;
+
                     while ((line = streamReader.ReadLine()) != null)
                     {
-                        _lines.Add(line);
+                        int wordsPos = 0;
+
+                        if (line.Length == 1)
+                        {
+                            photoCount = Int32.Parse(line);
+                        }
+                        else
+                        {
+                            Photo photo = new Photo();
+
+                            string[] words = line.Split(' ');
+
+                            if(words[wordsPos++] == "H")
+                                photo.Orientation = Orientation.Horizontal;
+                            else
+                                photo.Orientation = Orientation.Vertical;
+
+                            int tagCount = Int32.Parse(words[wordsPos++]);
+
+                            for(int i= 0; i < tagCount; i++)
+                            {
+                                photo.Tags.Add(words[wordsPos++]);
+                            }
+
+                            photo.Id = photoId++;
+                            _photo.Add(photo);
+                        }
                     }
                 }
             }
         }
 
-        public void GetInputData()
-        {
-            ReadInputFile();
-
-            _totalPhoto = Int32.Parse(_lines[0]);
-
-            for (int i = 1; i < _lines.Count; i++)
-            {
-                string[] words = _lines[i].Split(' ');
-
-                Photo photo = new Photo();
-
-                int pos = 0;
-
-                if (words[pos++] == "H")
-                    photo.Orientation = Orientation.Horizontal;
-                else
-                    photo.Orientation = Orientation.Vertical;
-
-                int count = Int32.Parse(words[pos++]);
-
-                for(int j = 0; j < count; j++)
-                {
-                    photo.Tags.Add(words[pos++]);
-                }
-
-                _photo.Add(photo);
-            }
-
-        }
     }
 }
-
-
-
-
-
-
-                                                         
