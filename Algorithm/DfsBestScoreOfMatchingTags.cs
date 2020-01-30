@@ -3,31 +3,78 @@ namespace HashPhotoSlideshow.Algorithm
     using System.Collections.Generic;
     using HashPhotoSlideshow.Controller;
     using HashPhotoSlideshow.Model;
+    using System.Threading.Tasks;
 
     public class DfsBestScoreOfMatchingTags : ISlideshowAlgorithm
     {
-        private Dictionary<string, PhotoCollection> TagCache = new Dictionary<string, PhotoCollection>();
-
         public Slideshow GenerateSlideshow(PhotoCollection photoCollection)
+        {
+            return PartitionAlgorithm(photoCollection, 3000);
+        }
+
+        internal Slideshow PartitionAlgorithm(PhotoCollection photoCollection, int partitionCount)
         {
             var slideshow = new Slideshow();
 
-            ConsoleProgressBar progressBar = new ConsoleProgressBar(0, photoCollection.Count);
+            int dividend = photoCollection.Count / partitionCount;
+            int remainder = photoCollection.Count % partitionCount;
+
+            var totalTasks = remainder > 0 ? dividend + 1 : dividend;
+            var tasks = new Task[totalTasks];
+
+            for (int i = 0; i < dividend; i++)
+            {
+                var state = new TaskState(new PhotoCollection(photoCollection.GetRange(i * partitionCount, partitionCount)));
+                tasks[i] = Task.Factory.StartNew(obj =>
+                {
+                    var taskState = obj as TaskState;
+                    var algorithm = new DfsBestScoreOfMatchingTags();
+                    taskState.Slideshow = algorithm.Algorithm(taskState.Photos);
+                }, state);
+            }
+
+            if (remainder > 0)
+            {
+                var state = new TaskState(new PhotoCollection(photoCollection.GetRange(partitionCount * dividend, remainder)));
+                tasks[totalTasks - 1] = Task.Factory.StartNew(obj =>
+                {
+                    var taskState = obj as TaskState;
+                    var algorithm = new DfsBestScoreOfMatchingTags();
+                    taskState.Slideshow = algorithm.Algorithm(taskState.Photos);
+                }, state);
+            }
+
+            Task.WaitAll(tasks);
+
+            foreach (var task in tasks)
+            {
+                var taskState = task.AsyncState as TaskState;
+                slideshow.Slides.AddRange(taskState.Slideshow.Slides);
+            }
+
+            return slideshow;
+        }
+
+        internal Slideshow Algorithm(PhotoCollection photoCollection)
+        {
+            var slideshow = new Slideshow();
 
             // Make local copy of photo collection
             var photos = new PhotoCollection();
             photos.AddRange(photoCollection);
 
             // Cache tag and photos
+            var tagCache = new Dictionary<string, PhotoCollection>();
+
             foreach (var photo in photos)
             {
                 foreach (var tag in photo.Tags)
                 {
-                    if (!TagCache.ContainsKey(tag))
+                    if (!tagCache.ContainsKey(tag))
                     {
-                        TagCache.Add(tag, new PhotoCollection());
+                        tagCache.Add(tag, new PhotoCollection());
                     }
-                    TagCache[tag].Add(photo);
+                    tagCache[tag].Add(photo);
                 }
             }
 
@@ -50,7 +97,7 @@ namespace HashPhotoSlideshow.Algorithm
 
                         foreach (var tag in photo.Tags)
                         {
-                            photoSetWithMatchingTags.UnionWith(TagCache[tag]);
+                            photoSetWithMatchingTags.UnionWith(tagCache[tag]);
                         }
                     }
 
@@ -144,17 +191,26 @@ namespace HashPhotoSlideshow.Algorithm
                     {
                         foreach (var tag in photo.Tags)
                         {
-                            TagCache[tag].Remove(photo);
+                            tagCache[tag].Remove(photo);
                         }
 
                         photos.Remove(photo);
                     }
                 }
-
-                progressBar.Progress(photoCollection.Count - photos.Count);
             }
 
             return slideshow;
+        }
+
+        internal class TaskState
+        {
+            public PhotoCollection Photos;
+            public Slideshow Slideshow;
+
+            public TaskState(PhotoCollection photos)
+            {
+                Photos = photos;
+            }
         }
     }
 }
