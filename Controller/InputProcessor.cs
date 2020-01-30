@@ -8,21 +8,13 @@ namespace HashPhotoSlideshow.Controller
 {
     public class InputProcessor
     {
-        public List<Photo> _photo;
-
-        public InputProcessor()
+        public static List<Photo> ReadInputFile(string filePath)
         {
-            _photo = new List<Photo>();
-        }
+            List<Photo> photoList = new List<Photo>();
 
-        public void ReadInputFile()
-        {
-            //string path = "..\\..\\..\\inputFile.txt"; 
-            string path = "inputFile.txt";
-
-            if (File.Exists(path))
+            if (File.Exists(filePath))
             {
-                FileStream fileStream = new FileStream(path, FileMode.Open, FileAccess.Read);
+                FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
                 using (var streamReader = new StreamReader(fileStream))
                 {
                     int photoCount = 0;
@@ -43,24 +35,26 @@ namespace HashPhotoSlideshow.Controller
 
                             string[] words = line.Split(' ');
 
-                            if(words[wordsPos++] == "H")
+                            if (words[wordsPos++] == "H")
                                 photo.Orientation = Orientation.Horizontal;
                             else
                                 photo.Orientation = Orientation.Vertical;
 
                             int tagCount = Int32.Parse(words[wordsPos++]);
 
-                            for(int i= 0; i < tagCount; i++)
+                            for (int i = 0; i < tagCount; i++)
                             {
                                 photo.Tags.Add(words[wordsPos++]);
                             }
 
                             photo.Id = photoId++;
-                            _photo.Add(photo);
+                            photoList.Add(photo);
                         }
                     }
                 }
             }
+
+            return photoList;
         }
 
     }
