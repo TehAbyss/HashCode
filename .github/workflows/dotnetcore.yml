@@ -15,3 +15,5 @@ jobs:
         dotnet-version: 3.1.101
     - name: Build with dotnet
       run: dotnet build --configuration Release
+    - name: Run an algorithm
+      run: dotnet run 1
