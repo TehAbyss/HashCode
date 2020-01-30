@@ -26,10 +26,10 @@ namespace HashPhotoSlideshow.Controller
             LoadAlgorithms();
         }
 
-        public void RunAlgorithm(int algorithmIndex)
+        public int RunAlgorithm(int algorithmIndex, string inputFilePath)
         {
             // Parse input file OR use test data
-            var photoCollection = GetTestData();
+            var photoCollection = new PhotoCollection(InputProcessor.ReadInputFile(inputFilePath));
 
             int numPhotos = photoCollection.Count;
             int numHorizontal = photoCollection.Where(p => p.Orientation == Orientation.Horizontal).Count();
@@ -50,7 +50,10 @@ namespace HashPhotoSlideshow.Controller
             var score = ScoringProcessor.Judge(slideshow);
 
             // Output submission file
-            string outputFileName = $"slideshow_{AlgorithmNames[algorithmIndex]}_{DateTime.Now.ToString("yyyyMMdd_hhmmss")}.txt";
+            var inputFileName = Path.GetFileNameWithoutExtension(inputFilePath);
+            var algorithmName = AlgorithmNames[algorithmIndex];
+            var currentTime = DateTime.Now.ToString("yyyyMMdd_hhmmss");
+            string outputFileName = $"slideshow_{inputFileName}_{algorithmName}_{currentTime}.txt";
             OutputProcessor.ProcessSlideShow(slideshow, outputFileName);
             Console.WriteLine($"Submission file saved to {Path.GetFullPath(outputFileName)}");
 
@@ -71,6 +74,8 @@ namespace HashPhotoSlideshow.Controller
             Console.WriteLine($"[Slides] {slideshow.Slides.Count}");
             Console.WriteLine($"[Score] {score}");
             Console.WriteLine();
+
+            return score;
         }
 
         private void LoadInputFiles()

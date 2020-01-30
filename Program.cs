@@ -6,13 +6,14 @@ namespace HashPhotoSlideshow
 
     class Program
     {
+        static SlideshowProcessor slideshowProcessor = new SlideshowProcessor();
+
         static void Main(string[] args)
         {
             var userInput = string.Empty;
             var isAll = false;
             var isQuit = false;
-
-            var slideshowProcessor = new SlideshowProcessor();
+            var hasArgs = (args.Length > 0);
 
             while (!isQuit)
             {
@@ -30,7 +31,15 @@ namespace HashPhotoSlideshow
                 Console.WriteLine();
 
                 Console.Write("Select algorithm: ");
-                userInput = Console.ReadLine();
+
+                if (hasArgs)
+                {
+                    userInput = args[0];
+                }
+                else
+                {
+                    userInput = Console.ReadLine();
+                }
 
                 Console.WriteLine();
 
@@ -45,14 +54,12 @@ namespace HashPhotoSlideshow
 
                         for (int i = 0; i < slideshowProcessor.AlgorithmNames.Count; i++)
                         {
-                            slideshowProcessor.RunAlgorithm(i);
-                            Console.WriteLine();
+                            RunAlgorithm(i);
                         }
                     }
                     else if (TryParseAlgorithmIndex(userInput, slideshowProcessor.AlgorithmNames.Count, out int i))
                     {
-                        slideshowProcessor.RunAlgorithm(i);
-                        Console.WriteLine();
+                        RunAlgorithm(i);
                     }
                     else
                     {
@@ -60,10 +67,37 @@ namespace HashPhotoSlideshow
                         Console.WriteLine();
                     }
 
-                    Console.Write("Press enter to continue...");
-                    Console.ReadLine();
+                    if (hasArgs)
+                    {
+                        isQuit = true;
+                    }
+                    else
+                    {
+                        Console.Write("Press enter to continue...");
+                        Console.ReadLine();
+                    }
                 }
             }
+        }
+
+        internal static void RunAlgorithm(int algorithmIndex)
+        {
+            var algorithmName = slideshowProcessor.AlgorithmNames[algorithmIndex];
+            int totalScore = 0;
+            var startTime = DateTime.Now;
+
+            foreach (var inputFilePath in slideshowProcessor.InputFilePaths)
+            {
+                totalScore += slideshowProcessor.RunAlgorithm(algorithmIndex, inputFilePath);
+                Console.WriteLine();
+            }
+
+            var endTime = DateTime.Now;
+
+            Console.WriteLine($"{algorithmName}");
+            Console.WriteLine($"[TOTAL DURATION] {endTime.Subtract(startTime).TotalMilliseconds} ms");
+            Console.WriteLine($"[TOTAL SCORE] {totalScore}");
+            Console.WriteLine();
         }
 
         internal static bool TryParseAlgorithmIndex(string userInput, int algorithmCount, out int algorithmIndex)

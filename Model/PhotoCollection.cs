@@ -7,5 +7,10 @@ namespace HashPhotoSlideshow.Model
         public PhotoCollection()
         {
         }
+
+        public PhotoCollection(IEnumerable<Photo> photos)
+        {
+            AddRange(photos);
+        }
     }
 }
