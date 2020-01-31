@@ -1,7 +1,6 @@
-HashPhotoSlideshow
+HashCode
 ============
-
-HashPhotoSlideshow is a group project to explore the "Photo slideshow" problem statement that was presented for the 2019 qualification round of [Hash Code](https://codingcompetitions.withgoogle.com/hashcode), a Google programming competition.
+This repository contain projects that explore [Hash Code](https://codingcompetitions.withgoogle.com/hashcode) coding competition problem statements.
 
 ## Get Started
 
