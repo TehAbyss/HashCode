@@ -1,16 +1,17 @@
-using HashPhotoSlideshow.Model;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-
 namespace HashPhotoSlideshow.Controller
 {
+    using HashPhotoSlideshow.Model;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Text;
+
     public class InputProcessor
     {
-        public static List<Photo> ReadInputFile(string filePath)
+        public static PhotoCollection ReadInputFile(string filePath)
         {
             List<Photo> photoList = new List<Photo>();
+            PhotoCollection photoCollection = new PhotoCollection();
 
             if (File.Exists(filePath))
             {
@@ -25,7 +26,7 @@ namespace HashPhotoSlideshow.Controller
                     {
                         int wordsPos = 0;
 
-                        if (line.Length == 1)
+                        if (photoCount == 0)
                         {
                             photoCount = Int32.Parse(line);
                         }
@@ -48,13 +49,13 @@ namespace HashPhotoSlideshow.Controller
                             }
 
                             photo.Id = photoId++;
-                            photoList.Add(photo);
+                            photoCollection.Add(photo);
                         }
                     }
                 }
             }
 
-            return photoList;
+            return photoCollection;
         }
 
     }
