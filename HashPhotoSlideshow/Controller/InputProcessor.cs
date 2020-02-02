@@ -2,15 +2,12 @@ namespace HashPhotoSlideshow.Controller
 {
     using HashPhotoSlideshow.Model;
     using System;
-    using System.Collections.Generic;
     using System.IO;
-    using System.Text;
 
     public class InputProcessor
     {
         public static PhotoCollection ReadInputFile(string filePath)
         {
-            List<Photo> photoList = new List<Photo>();
             PhotoCollection photoCollection = new PhotoCollection();
 
             if (File.Exists(filePath))
